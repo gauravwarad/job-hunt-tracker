@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Job Tracker</title>
+    <style>
+      input { width: 80%; padding: 10px; font-size: 1.2rem; }
+      ul { list-style: none; padding: 0; }
+      li { padding: 4px 0; font-family: sans-serif; }
+    </style>
+  </head>
+  <body>
+    <h2>Paste Job Link</h2>
+    <input id="job-link" placeholder="Paste job link here" autofocus />
+    <ul id="job-list"></ul>
+
+    <script>
+      const input = document.getElementById("job-link");
+      const jobList = document.getElementById("job-list");
+
+      input.addEventListener("keypress", async (e) => {
+        if (e.key === "Enter" && input.value.trim()) {
+          const url = input.value.trim();
+          input.value = "";
+          await fetch("http://localhost:8000/submit", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ url })
+          });
+        }
+      });
+
+      async function fetchStatus() {
+        const res = await fetch("http://localhost:8000/status");
+        const data = await res.json();
+        jobList.innerHTML = Object.values(data).map(job =>
+          `<li><strong>${job.status}</strong> — ${job.url}<br>
+            ${job.company || ""} ${job.position || ""} ${job.location || ""} (${job.h1b || ""})
+          </li>`
+        ).join("");
+      }
+
+      setInterval(fetchStatus, 2000);
+      fetchStatus();
+    </script>
+  </body>
+</html>
