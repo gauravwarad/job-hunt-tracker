@@ -54,7 +54,8 @@ def get_job_details(html):
         messages=[
             {"role": "user", "content": prompt + html},
         ],
-        model="llama3.1:8b",
+        # model="llama3.1:8b",
+        model="deepseek-coder-v2:latest",
         format=Job.model_json_schema(),
     )
 
